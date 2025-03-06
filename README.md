@@ -70,18 +70,6 @@ The **AI Agent** is configured with the following tools:
 
 ---
 
-## 📊 Flow Diagram
-
-The following image visualizes the complete workflow:
-
-![Workflow Diagram](./screenshot.png)
-
----
-
-## 📦 Folder Structure
-
-
----
 
 ## 📚 How to Use
 
@@ -120,18 +108,6 @@ The following image visualizes the complete workflow:
 
 ---
 
-## 📝 Contribution
-
-Contributions, issues, and feature requests are welcome!  
-Feel free to open an issue or pull request if you have suggestions.
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
 
 ## 🌐 Links
 
