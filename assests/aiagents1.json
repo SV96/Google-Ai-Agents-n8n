@@ -1,0 +1,474 @@
+{
+  "name": "aiagents1",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "99d30051-ba13-4a75-b094-a1ecbbd81cf0",
+      "name": "Telegram Trigger",
+      "webhookId": "2291a4e6-14ba-4af2-bce0-3c3e43b4e7c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "bMLEEvduokw4O4Dg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ffe45aad-0ccc-4482-95bc-b4bafa1539d3",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e33de602-a135-46af-acb6-7e459da04753",
+                    "leftValue": "=text {{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "9eb13425-f241-4ef4-85fb-085bcbdf4c83",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        -200
+      ],
+      "id": "c3dae3d5-cde9-4397-b0d4-fe55bd1e5db8",
+      "name": "Telegram",
+      "webhookId": "09fc0ba8-8c41-4030-bcc9-476276141d64",
+      "credentials": {
+        "telegramApi": {
+          "id": "bMLEEvduokw4O4Dg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fbca68aa-adba-44fd-a1d4-c5416090cf34",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        100
+      ],
+      "id": "56e74516-1722-494d-a099-4d7289b9daa9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        -200
+      ],
+      "id": "7a880060-6203-432b-9701-7cc3eb172133",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "QDjYrz7ZVrjhwYmU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.\n\nprocess : you are reading/listening data from telegram and responding as per the required task. \n\ntask includes \n1. Email read and send \n\n- read email from inbox and provide the required things as per input.\n\n- send email to defined email address. please look for concise subject and body and also add declarations to mail  \n\n2. Read and set events in calendar \n\n- Read events from calendar and response as per required input.\n\n- set and event with provide duration or time. add title and invites to event. \n\n\nSo make sure you are deeply of today's due date: {{$now}}.  DO NOT use any other dates, this is official date."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        900,
+        -40
+      ],
+      "id": "749c0554-73ef-4ce0-b674-3d798674d9ca",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        340
+      ],
+      "id": "ecbdb450-1da2-49d2-b5b5-d44d89a92306",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "QDjYrz7ZVrjhwYmU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1260,
+        -60
+      ],
+      "id": "a95947f2-77f0-4828-847c-68774c1c77f9",
+      "name": "Telegram1",
+      "webhookId": "14621584-9093-47c8-a653-105e63bf1605",
+      "credentials": {
+        "telegramApi": {
+          "id": "bMLEEvduokw4O4Dg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1420,
+        340
+      ],
+      "id": "622df3c4-498f-4232-8541-e0f0209c437f",
+      "name": "get many",
+      "webhookId": "86394674-fcf5-48ce-a4e6-42014ca3bc16",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7r3JDakJhfRPh547",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('To', `raw email address of recepient`, 'string') }}",
+        "subject": "={{ $fromAI('Subject', `a clear and concise subject line`, 'string') }}",
+        "emailType": "text",
+        "message": "={{ $fromAI('Message', `the body of email itself`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        340
+      ],
+      "id": "34f4a510-2988-4123-b0c5-627214856769",
+      "name": "Gmail Send",
+      "webhookId": "2d58fa88-f855-4a91-8f29-c2b23abf3ed8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7r3JDakJhfRPh547",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "shah30988@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shah30988@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "2025-01-01T00:00:00",
+        "timeMax": "2026-01-01T00:00:00",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        340
+      ],
+      "id": "e6605723-0eaa-48d3-a04f-e4ef1a3801a3",
+      "name": "Get event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OT8o8wAvJqKKQx1C",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "shah30988@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shah30988@gmail.com"
+        },
+        "start": "={{ $fromAI('Start', `date and time when event shuold start`, 'string') }}",
+        "end": "={{ $fromAI('End', `ate and time when event shuold end`, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ $fromAI('title', `title of an event`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1080,
+        340
+      ],
+      "id": "06a0e7b9-4e77-44bc-8e38-2d6898509450",
+      "name": "Set Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OT8o8wAvJqKKQx1C",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get many": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Send": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5f8e37dd-c75e-4aea-b5b5-55dfa197b603",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bab35ba730ffc2411a8d3c0a0a2e0df600032fb3f2bedaa92d62e95f5ba32a73"
+  },
+  "id": "kzy62k0GiGraMTZJ",
+  "tags": []
+}
